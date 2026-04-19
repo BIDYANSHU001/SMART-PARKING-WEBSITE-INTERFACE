@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmartPark — Intelligent Parking Management System</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #050d1a;
+    --surface: #0a1628;
+    --card: #0f1f38;
+    --border: rgba(0,200,255,0.12);
+    --teal: #00c8ff;
+    --lime: #a8ff3e;
+    --orange: #ff6b35;
+    --purple: #7c3aed;
+    --text: #e8f4fd;
+    --muted: #7a9bb5;
+    --glow: 0 0 30px rgba(0,200,255,0.25);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
+  }
+
+  /* ===== NAV ===== */
+  nav {
+    position: fixed; top:0; left:0; right:0; z-index:100;
+    display: flex; align-items:center; justify-content:space-between;
+    padding: 18px 5%;
+    background: rgba(5,13,26,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-family:'Syne',sans-serif; font-weight:800; font-size:1.4rem;
+    color: var(--teal); letter-spacing:-0.5px;
+  }
+  .nav-logo span { color: var(--lime); }
+  .nav-links { display:flex; gap:32px; }
+  .nav-links a {
+    color: var(--muted); text-decoration:none; font-size:0.9rem;
+    font-weight:500; transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--teal); }
+  .nav-cta {
+    background: var(--teal); color: var(--bg);
+    padding: 9px 22px; border-radius:8px;
+    font-weight:600; font-size:0.85rem; cursor:pointer; border:none;
+    font-family:'DM Sans',sans-serif;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .nav-cta:hover { transform:translateY(-1px); box-shadow: var(--glow); }
+
+  /* ===== HERO ===== */
+  #hero {
+    min-height: 100vh;
+    display: flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding: 100px 5% 60px;
+    position:relative; overflow:hidden;
+  }
+  .hero-grid {
+    position:absolute; inset:0;
+    background-image:
+      linear-gradient(rgba(0,200,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,200,255,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    animation: gridMove 20s linear infinite;
+  }
+  @keyframes gridMove { from{transform:translateY(0)} to{transform:translateY(60px)} }
+  .hero-glow {
+    position:absolute; width:600px; height:600px; border-radius:50%;
+    background: radial-gradient(circle, rgba(0,200,255,0.08) 0%, transparent 70%);
+    top:50%; left:50%; transform:translate(-50%,-50%);
+    animation: pulse 4s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{transform:translate(-50%,-50%) scale(1)} 50%{transform:translate(-50%,-50%) scale(1.1)} }
+  .hero-badge {
+    display:inline-flex; align-items:center; gap:8px;
+    background: rgba(0,200,255,0.08); border:1px solid rgba(0,200,255,0.2);
+    padding: 6px 18px; border-radius:50px; margin-bottom:32px;
+    font-size:0.8rem; color:var(--teal); font-weight:500;
+    animation: fadeUp 0.6s ease both;
+  }
+  .badge-dot { width:7px; height:7px; border-radius:50%; background:var(--lime); animation:blink 1.5s infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .hero-title {
+    font-family:'Syne',sans-serif; font-size:clamp(2.8rem,7vw,6rem);
+    font-weight:800; line-height:1.05; margin-bottom:24px;
+    animation: fadeUp 0.6s 0.1s ease both;
+  }
+  .hero-title .accent { color: var(--teal); }
+  .hero-title .accent2 { color: var(--lime); }
+  .hero-sub {
+    font-size:1.15rem; color:var(--muted); max-width:600px; line-height:1.7;
+    margin-bottom:40px; font-weight:300;
+    animation: fadeUp 0.6s 0.2s ease both;
+  }
+  .hero-btns { display:flex; gap:16px; justify-content:center; flex-wrap:wrap;
+    animation: fadeUp 0.6s 0.3s ease both; }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--teal), #0080ff);
+    color:#fff; padding:14px 32px; border-radius:10px;
+    font-weight:600; font-size:1rem; cursor:pointer; border:none;
+    font-family:'DM Sans',sans-serif;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .btn-primary:hover { transform:translateY(-2px); box-shadow:0 8px 30px rgba(0,200,255,0.35); }
+  .btn-secondary {
+    background:transparent; color:var(--text);
+    border:1px solid var(--border); padding:14px 32px; border-radius:10px;
+    font-weight:500; font-size:1rem; cursor:pointer;
+    font-family:'DM Sans',sans-serif;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .btn-secondary:hover { border-color:var(--teal); color:var(--teal); }
+  .hero-stats {
+    display:flex; gap:48px; margin-top:64px; flex-wrap:wrap; justify-content:center;
+    animation: fadeUp 0.6s 0.4s ease both;
+  }
+  .stat { text-align:center; }
+  .stat-num { font-family:'Syne',sans-serif; font-size:2.2rem; font-weight:800; color:var(--teal); }
+  .stat-label { font-size:0.8rem; color:var(--muted); margin-top:4px; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+
+  /* ===== PARKING DEMO ===== */
+  #demo {
+    padding: 100px 5%;
+    position:relative;
+  }
+  .section-label {
+    font-size:0.75rem; font-weight:600; letter-spacing:3px; color:var(--teal);
+    text-transform:uppercase; margin-bottom:12px;
+  }
+  .section-title {
+    font-family:'Syne',sans-serif; font-size:clamp(1.8rem,4vw,3rem);
+    font-weight:700; margin-bottom:16px;
+  }
+  .section-desc { color:var(--muted); max-width:560px; line-height:1.7; margin-bottom:48px; }
+  .demo-wrapper {
+    display:grid; grid-template-columns:1fr 1fr; gap:40px; align-items:start;
+  }
+  .parking-lot {
+    background: var(--surface);
+    border:1px solid var(--border); border-radius:20px;
+    padding:28px; position:relative; overflow:hidden;
+  }
+  .lot-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+  .lot-title { font-family:'Syne',sans-serif; font-weight:700; font-size:1rem; }
+  .lot-count { font-size:0.8rem; color:var(--muted); }
+  .lot-count span { color:var(--lime); font-weight:600; }
+  .parking-grid {
+    display:grid; grid-template-columns:repeat(5,1fr); gap:10px;
+  }
+  .spot {
+    aspect-ratio:1; border-radius:8px; border:2px solid;
+    display:flex; align-items:center; justify-content:center;
+    font-size:0.7rem; font-weight:600; cursor:pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    position:relative;
+  }
+  .spot:hover { transform:scale(1.05); }
+  .spot.available {
+    border-color: rgba(168,255,62,0.4);
+    background: rgba(168,255,62,0.08);
+    color: var(--lime);
+  }
+  .spot.occupied {
+    border-color: rgba(255,107,53,0.4);
+    background: rgba(255,107,53,0.08);
+    color: var(--orange);
+  }
+  .spot.reserved {
+    border-color: rgba(0,200,255,0.4);
+    background: rgba(0,200,255,0.08);
+    color: var(--teal);
+  }
+  .spot.selected {
+    border-color: var(--lime) !important;
+    background: rgba(168,255,62,0.2) !important;
+    box-shadow: 0 0 16px rgba(168,255,62,0.4);
+  }
+  .car-icon { font-size:1.1rem; }
+  .lot-legend { display:flex; gap:16px; margin-top:16px; flex-wrap:wrap; }
+  .legend-item { display:flex; align-items:center; gap:6px; font-size:0.75rem; color:var(--muted); }
+  .legend-dot { width:10px; height:10px; border-radius:3px; }
+  .dot-avail { background:rgba(168,255,62,0.4); }
+  .dot-occ { background:rgba(255,107,53,0.4); }
+  .dot-res { background:rgba(0,200,255,0.4); }
+
+  .demo-panel {
+    display:flex; flex-direction:column; gap:20px;
+  }
+  .panel-card {
+    background: var(--surface); border:1px solid var(--border);
+    border-radius:16px; padding:24px;
+    transition: border-color 0.3s;
+  }
+  .panel-card:hover { border-color:rgba(0,200,255,0.3); }
+  .panel-card-title {
+    font-family:'Syne',sans-serif; font-weight:700; font-size:0.9rem;
+    color:var(--teal); margin-bottom:16px; display:flex; align-items:center; gap:8px;
+  }
+  .sensor-row {
+    display:flex; justify-content:space-between; align-items:center;
+    padding: 10px 0; border-bottom:1px solid var(--border);
+  }
+  .sensor-row:last-child { border-bottom:none; }
+  .sensor-name { font-size:0.85rem; color:var(--muted); }
+  .sensor-val { font-size:0.85rem; font-weight:600; }
+  .sensor-val.ok { color:var(--lime); }
+  .sensor-val.warn { color:var(--orange); }
+  .sensor-val.info { color:var(--teal); }
+  .occupancy-bar {
+    height:8px; background:rgba(255,255,255,0.06); border-radius:50px;
+    overflow:hidden; margin:12px 0 6px;
+  }
+  .occupancy-fill {
+    height:100%; border-radius:50px;
+    background: linear-gradient(90deg, var(--teal), var(--lime));
+    transition: width 1s ease;
+  }
+  .occ-label { display:flex; justify-content:space-between; font-size:0.75rem; color:var(--muted); }
+  .book-btn {
+    width:100%; padding:12px; margin-top:12px;
+    background: linear-gradient(135deg, var(--teal), #0080ff);
+    color:#fff; border:none; border-radius:10px;
+    font-family:'DM Sans',sans-serif; font-weight:600; font-size:0.95rem;
+    cursor:pointer; transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .book-btn:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(0,200,255,0.3); }
+  .book-btn:disabled { opacity:0.4; cursor:not-allowed; }
+  .selected-info { font-size:0.8rem; color:var(--muted); text-align:center; margin-top:8px; }
+
+  /* ===== PROBLEM ===== */
+  #problem {
+    padding: 100px 5%;
+    background: linear-gradient(180deg, var(--bg) 0%, #050a14 100%);
+  }
+  .problem-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:24px; }
+  .problem-card {
+    background: var(--surface); border:1px solid var(--border);
+    border-radius:16px; padding:28px;
+    transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+  }
+  .problem-card:hover { transform:translateY(-4px); border-color:rgba(255,107,53,0.4); box-shadow:0 8px 32px rgba(255,107,53,0.08); }
+  .problem-icon { font-size:2.2rem; margin-bottom:16px; }
+  .problem-title { font-family:'Syne',sans-serif; font-weight:700; font-size:1.05rem; margin-bottom:10px; }
+  .problem-desc { color:var(--muted); font-size:0.88rem; line-height:1.65; }
+
+  /* ===== SOLUTION ===== */
+  #solution { padding:100px 5%; }
+  .solution-flow { display:flex; gap:0; align-items:stretch; flex-wrap:wrap; }
+  .flow-step {
+    flex:1; min-width:180px; background:var(--card);
+    border:1px solid var(--border); padding:28px 20px;
+    text-align:center; position:relative;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+  .flow-step:first-child { border-radius:16px 0 0 16px; }
+  .flow-step:last-child { border-radius:0 16px 16px 0; }
+  .flow-step:not(:last-child)::after {
+    content:'→'; position:absolute; right:-14px; top:50%; transform:translateY(-50%);
+    color:var(--teal); font-size:1.2rem; z-index:1;
+  }
+  .flow-step:hover { transform:translateY(-4px); border-color:var(--teal); z-index:1; }
+  .step-num {
+    width:36px; height:36px; border-radius:50%;
+    background: linear-gradient(135deg, var(--teal), #0080ff);
+    display:flex; align-items:center; justify-content:center;
+    margin:0 auto 14px; font-weight:800; font-size:0.9rem;
+    font-family:'Syne',sans-serif;
+  }
+  .step-icon { font-size:2rem; margin-bottom:12px; }
+  .step-title { font-family:'Syne',sans-serif; font-weight:700; font-size:0.9rem; margin-bottom:8px; }
+  .step-desc { font-size:0.78rem; color:var(--muted); line-height:1.5; }
+
+  /* ===== TECH STACK ===== */
+  #tech { padding:100px 5%; background:var(--surface); }
+  .tech-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:20px; }
+  .tech-card {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:16px; padding:24px; text-align:center;
+    transition: transform 0.3s, border-color 0.3s;
+    cursor:default;
+  }
+  .tech-card:hover { transform:translateY(-4px); border-color:rgba(0,200,255,0.35); }
+  .tech-icon { font-size:2.4rem; margin-bottom:12px; }
+  .tech-name { font-family:'Syne',sans-serif; font-weight:700; font-size:0.95rem; margin-bottom:6px; }
+  .tech-role { font-size:0.78rem; color:var(--muted); }
+  .tech-tag {
+    display:inline-block; padding:3px 10px; border-radius:50px;
+    font-size:0.7rem; font-weight:600; margin-top:10px;
+  }
+  .tag-hw { background:rgba(168,255,62,0.1); color:var(--lime); border:1px solid rgba(168,255,62,0.2); }
+  .tag-sw { background:rgba(0,200,255,0.1); color:var(--teal); border:1px solid rgba(0,200,255,0.2); }
+  .tag-cloud { background:rgba(124,58,237,0.1); color:#a78bfa; border:1px solid rgba(124,58,237,0.2); }
+
+  /* ===== BENEFITS ===== */
+  #benefits { padding:100px 5%; }
+  .benefits-split { display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:center; }
+  .benefit-list { display:flex; flex-direction:column; gap:20px; }
+  .benefit-item { display:flex; gap:16px; align-items:flex-start; }
+  .benefit-icon-wrap {
+    width:44px; height:44px; border-radius:12px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.3rem;
+  }
+  .bi-teal { background:rgba(0,200,255,0.1); }
+  .bi-lime { background:rgba(168,255,62,0.1); }
+  .bi-orange { background:rgba(255,107,53,0.1); }
+  .bi-purple { background:rgba(124,58,237,0.1); }
+  .benefit-text h4 { font-family:'Syne',sans-serif; font-weight:700; margin-bottom:4px; }
+  .benefit-text p { color:var(--muted); font-size:0.85rem; line-height:1.6; }
+  .big-stat-box {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:24px; padding:40px; text-align:center;
+  }
+  .big-num {
+    font-family:'Syne',sans-serif; font-size:4rem; font-weight:800;
+    background: linear-gradient(135deg, var(--teal), var(--lime));
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    background-clip:text;
+  }
+  .big-label { color:var(--muted); margin-top:8px; font-size:0.9rem; }
+  .big-divider { height:1px; background:var(--border); margin:24px 0; }
+
+  /* ===== TEAM ===== */
+  #team { padding:100px 5%; background:var(--surface); }
+  .team-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:24px; }
+  .team-card {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:16px; padding:28px 20px; text-align:center;
+    transition: transform 0.3s, border-color 0.3s;
+  }
+  .team-card:hover { transform:translateY(-4px); border-color:rgba(0,200,255,0.3); }
+  .team-avatar {
+    width:64px; height:64px; border-radius:50%;
+    background: linear-gradient(135deg, var(--teal), #0080ff);
+    display:flex; align-items:center; justify-content:center;
+    margin:0 auto 14px; font-size:1.5rem;
+    border:2px solid rgba(0,200,255,0.3);
+  }
+  .team-name { font-family:'Syne',sans-serif; font-weight:700; font-size:0.95rem; }
+  .team-role { color:var(--muted); font-size:0.78rem; margin-top:4px; }
+
+  /* ===== FOOTER ===== */
+  footer {
+    padding:40px 5%; border-top:1px solid var(--border);
+    display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px;
+  }
+  .footer-logo { font-family:'Syne',sans-serif; font-weight:800; color:var(--teal); font-size:1.2rem; }
+  .footer-logo span { color:var(--lime); }
+  .footer-text { color:var(--muted); font-size:0.82rem; }
+
+  /* ===== SCROLLBAR ===== */
+  ::-webkit-scrollbar { width:6px; }
+  ::-webkit-scrollbar-track { background:var(--bg); }
+  ::-webkit-scrollbar-thumb { background:rgba(0,200,255,0.3); border-radius:3px; }
+
+  /* ===== TOAST ===== */
+  #toast {
+    position:fixed; bottom:30px; right:30px; z-index:999;
+    background:var(--card); border:1px solid rgba(168,255,62,0.3);
+    color:var(--lime); padding:14px 24px; border-radius:12px;
+    font-size:0.9rem; font-weight:500;
+    transform:translateY(80px); opacity:0;
+    transition: transform 0.4s, opacity 0.4s;
+    box-shadow:0 8px 32px rgba(0,0,0,0.4);
+  }
+  #toast.show { transform:translateY(0); opacity:1; }
+
+  /* ===== RESPONSIVE ===== */
+  @media(max-width:768px) {
+    .nav-links { display:none; }
+    .demo-wrapper { grid-template-columns:1fr; }
+    .solution-flow { flex-direction:column; }
+    .flow-step { border-radius:12px !important; }
+    .flow-step:not(:last-child)::after { content:'↓'; right:50%; bottom:-18px; top:auto; transform:translateX(50%); }
+    .benefits-split { grid-template-columns:1fr; }
+    .hero-stats { gap:28px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Smart<span>Park</span></div>
+  <div class="nav-links">
+    <a href="#problem">Problem</a>
+    <a href="#demo">Live Demo</a>
+    <a href="#solution">Solution</a>
+    <a href="#tech">Technology</a>
+    <a href="#benefits">Benefits</a>
+    <a href="#team">Team</a>
+  </div>
+  <button class="nav-cta" onclick="scrollTo('#demo')">Try Demo</button>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-badge"><div class="badge-dot"></div>Project-Based Learning · Final Year Project 2024</div>
+  <h1 class="hero-title">Intelligent <span class="accent">Parking</span><br>for the <span class="accent2">Modern City</span></h1>
+  <p class="hero-sub">An IoT-powered smart parking management system that eliminates congestion, reduces fuel waste, and optimizes urban space using real-time sensor data and AI.</p>
+  <div class="hero-btns">
+    <button class="btn-primary" onclick="document.getElementById('demo').scrollIntoView({behavior:'smooth'})">🅿️ Try Live Demo</button>
+    <button class="btn-secondary" onclick="document.getElementById('problem').scrollIntoView({behavior:'smooth'})">View Project</button>
+  </div>
+  <div class="hero-stats">
+    <div class="stat"><div class="stat-num" id="cnt1">0</div><div class="stat-label">Minutes Saved / Visit</div></div>
+    <div class="stat"><div class="stat-num" id="cnt2">0</div><div class="stat-label">% Fuel Reduction</div></div>
+    <div class="stat"><div class="stat-num" id="cnt3">0</div><div class="stat-label">% Accuracy</div></div>
+    <div class="stat"><div class="stat-num" id="cnt4">0</div><div class="stat-label">Real-Time Sensors</div></div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section id="problem">
+  <div class="section-label">The Challenge</div>
+  <h2 class="section-title">Why Parking is a<br><span style="color:var(--orange)">Major Urban Problem</span></h2>
+  <p class="section-desc">Urban parking is an invisible crisis. Drivers waste enormous time and fuel searching for spots — a solvable problem with the right technology.</p>
+  <div class="problem-grid">
+    <div class="problem-card">
+      <div class="problem-icon">🚗</div>
+      <div class="problem-title">Traffic Congestion</div>
+      <div class="problem-desc">30% of urban traffic is caused by drivers circling to find parking spots, worsening rush-hour gridlock and air quality.</div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-icon">⏱️</div>
+      <div class="problem-title">Time Wastage</div>
+      <div class="problem-desc">The average driver spends 17 minutes hunting for a parking space — totaling over 100 hours per year in major cities.</div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-icon">⛽</div>
+      <div class="problem-title">Fuel Waste & Emissions</div>
+      <div class="problem-desc">Searching for parking wastes 1.7 million gallons of fuel daily and contributes significantly to CO₂ emissions in urban cores.</div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-icon">💸</div>
+      <div class="problem-title">Revenue Loss</div>
+      <div class="problem-desc">Poorly managed parking lots lose 30–40% revenue potential due to inefficient space utilization and manual management errors.</div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-icon">😤</div>
+      <div class="problem-title">Driver Frustration</div>
+      <div class="problem-desc">Parking stress increases road rage incidents and reduces overall urban experience, affecting businesses and visitor footfall.</div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-icon">📊</div>
+      <div class="problem-title">No Real-Time Data</div>
+      <div class="problem-desc">Traditional lots lack occupancy tracking, making predictive management, dynamic pricing, and reservations impossible.</div>
+    </div>
+  </div>
+</section>
+
+<!-- DEMO -->
+<section id="demo">
+  <div class="section-label">Live Simulation</div>
+  <h2 class="section-title">Interactive <span style="color:var(--teal)">Parking Dashboard</span></h2>
+  <p class="section-desc">Click any available spot to reserve it. Watch real-time sensor data update instantly. This simulates the actual SmartPark system.</p>
+  <div class="demo-wrapper">
+    <div class="parking-lot">
+      <div class="lot-header">
+        <div class="lot-title">🅿️ Block A — Ground Floor</div>
+        <div class="lot-count">Available: <span id="availCount">--</span> / 20</div>
+      </div>
+      <div class="parking-grid" id="parkingGrid"></div>
+      <div class="lot-legend">
+        <div class="legend-item"><div class="legend-dot dot-avail"></div>Available</div>
+        <div class="legend-item"><div class="legend-dot dot-occ"></div>Occupied</div>
+        <div class="legend-item"><div class="legend-dot dot-res"></div>Reserved</div>
+      </div>
+    </div>
+
+    <div class="demo-panel">
+      <div class="panel-card">
+        <div class="panel-card-title">📡 Live Sensor Feed</div>
+        <div class="sensor-row">
+          <div class="sensor-name">IR Sensor A1-A5</div>
+          <div class="sensor-val ok" id="sen1">All Clear</div>
+        </div>
+        <div class="sensor-row">
+          <div class="sensor-name">Ultrasonic B1-B5</div>
+          <div class="sensor-val warn" id="sen2">3 Detected</div>
+        </div>
+        <div class="sensor-row">
+          <div class="sensor-name">Camera Vision</div>
+          <div class="sensor-val info">Active ●</div>
+        </div>
+        <div class="sensor-row">
+          <div class="sensor-name">Arduino Controller</div>
+          <div class="sensor-val ok">Online ✓</div>
+        </div>
+        <div class="sensor-row">
+          <div class="sensor-name">Cloud Sync (Firebase)</div>
+          <div class="sensor-val info">Connected</div>
+        </div>
+      </div>
+
+      <div class="panel-card">
+        <div class="panel-card-title">📈 Occupancy Rate</div>
+        <div class="occupancy-bar">
+          <div class="occupancy-fill" id="occFill" style="width:0%"></div>
+        </div>
+        <div class="occ-label">
+          <span>0%</span>
+          <span id="occPct">—</span>
+          <span>100%</span>
+        </div>
+      </div>
+
+      <div class="panel-card">
+        <div class="panel-card-title">🎫 Quick Reserve</div>
+        <p style="font-size:0.82rem;color:var(--muted);margin-bottom:12px;">Select an available spot from the grid, then confirm your booking below.</p>
+        <div class="selected-info" id="selectedInfo">No spot selected</div>
+        <button class="book-btn" id="bookBtn" disabled onclick="confirmBooking()">Reserve Selected Spot</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOLUTION -->
+<section id="solution">
+  <div class="section-label">How It Works</div>
+  <h2 class="section-title">System <span style="color:var(--lime)">Architecture</span></h2>
+  <p class="section-desc" style="margin-bottom:40px;">A seamless pipeline from physical sensors to user's smartphone — five stages, fully automated.</p>
+  <div class="solution-flow">
+    <div class="flow-step">
+      <div class="step-icon">🔌</div>
+      <div class="step-num">1</div>
+      <div class="step-title">Sensor Detection</div>
+      <div class="step-desc">IR & ultrasonic sensors detect vehicle presence in each spot in real-time</div>
+    </div>
+    <div class="flow-step">
+      <div class="step-icon">🤖</div>
+      <div class="step-num">2</div>
+      <div class="step-title">Arduino Processing</div>
+      <div class="step-desc">Microcontroller aggregates sensor data and controls LED indicators at each spot</div>
+    </div>
+    <div class="flow-step">
+      <div class="step-icon">☁️</div>
+      <div class="step-num">3</div>
+      <div class="step-title">Cloud Upload</div>
+      <div class="step-desc">ESP8266 WiFi module pushes live status to Firebase Realtime Database</div>
+    </div>
+    <div class="flow-step">
+      <div class="step-icon">🧠</div>
+      <div class="step-num">4</div>
+      <div class="step-title">AI Analytics</div>
+      <div class="step-desc">Predictive algorithms forecast peak hours and suggest optimal spot allocation</div>
+    </div>
+    <div class="flow-step">
+      <div class="step-icon">📱</div>
+      <div class="step-num">5</div>
+      <div class="step-title">User Interface</div>
+      <div class="step-desc">Drivers see live availability on web/mobile and pre-book spots before arriving</div>
+    </div>
+  </div>
+</section>
+
+<!-- TECH -->
+<section id="tech">
+  <div class="section-label">Technology Stack</div>
+  <h2 class="section-title">Tools & <span style="color:var(--teal)">Components</span></h2>
+  <p class="section-desc">A carefully selected hardware and software stack balancing cost, reliability, and performance.</p>
+  <div class="tech-grid">
+    <div class="tech-card">
+      <div class="tech-icon">🤖</div>
+      <div class="tech-name">Arduino Uno</div>
+      <div class="tech-role">Microcontroller brain for sensor aggregation & LED control</div>
+      <div class="tech-tag tag-hw">Hardware</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-icon">📡</div>
+      <div class="tech-name">IR Sensors (FC-51)</div>
+      <div class="tech-role">Infrared proximity detection for each parking slot</div>
+      <div class="tech-tag tag-hw">Hardware</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-icon">🔊</div>
+      <div class="tech-name">HC-SR04</div>
+      <div class="tech-role">Ultrasonic sensor for distance-based vehicle confirmation</div>
+      <div class="tech-tag tag-hw">Hardware</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-icon">📶</div>
+      <div class="tech-name">ESP8266 WiFi</div>
+      <div class="tech-role">NodeMCU module for wireless data transmission to cloud</div>
+      <div class="tech-tag tag-hw">Hardware</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-icon">🔥</div>
+      <div class="tech-name">Firebase</div>
+      <div class="tech-role">Realtime Database for instant cloud sync and authentication</div>
+      <div class="tech-tag tag-cloud">Cloud</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-icon">🌐</div>
+      <div class="tech-name">HTML/CSS/JS</div>
+      <div class="tech-role">Responsive web dashboard for admin and user interfaces</div>
+      <div class="tech-tag tag-sw">Software</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-icon">🐍</div>
+      <div class="tech-name">Python</div>
+      <div class="tech-role">Backend analytics, ML prediction, and data processing layer</div>
+      <div class="tech-tag tag-sw">Software</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-icon">💡</div>
+      <div class="tech-name">LED Indicators</div>
+      <div class="tech-role">Green/Red visual indicators at each spot for on-site guidance</div>
+      <div class="tech-tag tag-hw">Hardware</div>
+    </div>
+  </div>
+</section>
+
+<!-- BENEFITS -->
+<section id="benefits">
+  <div class="section-label">Project Impact</div>
+  <h2 class="section-title">Why <span style="color:var(--lime)">SmartPark</span> Matters</h2>
+  <div class="benefits-split" style="margin-top:48px;">
+    <div class="benefit-list">
+      <div class="benefit-item">
+        <div class="benefit-icon-wrap bi-teal">⚡</div>
+        <div class="benefit-text">
+          <h4>Real-Time Availability</h4>
+          <p>Drivers see live spot status before arriving, eliminating circling and reducing entry traffic by up to 40%.</p>
+        </div>
+      </div>
+      <div class="benefit-item">
+        <div class="benefit-icon-wrap bi-lime">🌱</div>
+        <div class="benefit-text">
+          <h4>Environmental Impact</h4>
+          <p>Less idle driving means fewer emissions. SmartPark reduces parking-related CO₂ by an estimated 30% per lot.</p>
+        </div>
+      </div>
+      <div class="benefit-item">
+        <div class="benefit-icon-wrap bi-orange">📊</div>
+        <div class="benefit-text">
+          <h4>Revenue Optimization</h4>
+          <p>Automated data lets lot owners implement dynamic pricing and maximize revenue during peak hours.</p>
+        </div>
+      </div>
+      <div class="benefit-item">
+        <div class="benefit-icon-wrap bi-purple">🔮</div>
+        <div class="benefit-text">
+          <h4>Predictive Intelligence</h4>
+          <p>ML models forecast demand patterns so administrators can prepare staffing, maintenance, and pricing proactively.</p>
+        </div>
+      </div>
+      <div class="benefit-item">
+        <div class="benefit-icon-wrap bi-teal">♿</div>
+        <div class="benefit-text">
+          <h4>Accessible Spot Management</h4>
+          <p>System can prioritize and reserve differently-abled parking spots automatically with real-time tracking.</p>
+        </div>
+      </div>
+    </div>
+    <div class="big-stat-box">
+      <div style="font-size:0.75rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;">Projected Annual Impact</div>
+      <div class="big-num">17 min</div>
+      <div class="big-label">Average time saved per driver per visit</div>
+      <div class="big-divider"></div>
+      <div class="big-num">40%</div>
+      <div class="big-label">Reduction in parking search traffic</div>
+      <div class="big-divider"></div>
+      <div class="big-num">95%</div>
+      <div class="big-label">Sensor detection accuracy in testing</div>
+      <div class="big-divider"></div>
+      <div class="big-num">₹ 2.4L</div>
+      <div class="big-label">Estimated annual revenue increase per 100-spot lot</div>
+    </div>
+  </div>
+</section>
+
+<!-- TEAM -->
+<section id="team">
+  <div class="section-label">The Team</div>
+  <h2 class="section-title">Meet the <span style="color:var(--teal)">Developers</span></h2>
+  <p class="section-desc">Final-year engineering students passionate about IoT and smart city solutions.</p>
+  <div class="team-grid">
+    <div class="team-card">
+      <div class="team-avatar">👨‍💻</div>
+      <div class="team-name">Team Member 1</div>
+      <div class="team-role">Hardware & Sensors</div>
+    </div>
+    <div class="team-card">
+      <div class="team-avatar">👩‍💻</div>
+      <div class="team-name">Team Member 2</div>
+      <div class="team-role">Backend & Cloud</div>
+    </div>
+    <div class="team-card">
+      <div class="team-avatar">👨‍🎨</div>
+      <div class="team-name">Team Member 3</div>
+      <div class="team-role">Frontend & UI/UX</div>
+    </div>
+    <div class="team-card">
+      <div class="team-avatar">👩‍🔬</div>
+      <div class="team-name">Team Member 4</div>
+      <div class="team-role">ML & Analytics</div>
+    </div>
+    <div class="team-card">
+      <div class="team-avatar">👨‍🏫</div>
+      <div class="team-name">Project Guide</div>
+      <div class="team-role">Faculty Mentor</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Smart<span>Park</span></div>
+  <div class="footer-text">PBL Project 2024 · Computer / Electronics Engineering · All Rights Reserved</div>
+</footer>
+
+<!-- TOAST -->
+<div id="toast">✅ Spot Reserved Successfully!</div>
+
+<script>
+  // ===== COUNTER ANIMATION =====
+  function animateCounter(el, target, suffix='', duration=1800) {
+    let start = 0, step = target / (duration / 16);
+    let timer = setInterval(() => {
+      start = Math.min(start + step, target);
+      el.textContent = Math.round(start) + suffix;
+      if(start >= target) clearInterval(timer);
+    }, 16);
+  }
+  setTimeout(() => {
+    animateCounter(document.getElementById('cnt1'), 17, ' min');
+    animateCounter(document.getElementById('cnt2'), 40, '%');
+    animateCounter(document.getElementById('cnt3'), 95, '%');
+    animateCounter(document.getElementById('cnt4'), 120, '+');
+  }, 300);
+
+  // ===== PARKING DEMO =====
+  const spots = [];
+  const initialOccupied = [2, 5, 8, 11, 14, 17]; // pre-occupied spots
+  let selectedSpot = null;
+
+  function initParkingGrid() {
+    const grid = document.getElementById('parkingGrid');
+    grid.innerHTML = '';
+    for(let i = 0; i < 20; i++) {
+      const spot = { id: i, status: initialOccupied.includes(i) ? 'occupied' : 'available' };
+      spots.push(spot);
+      const el = document.createElement('div');
+      el.className = `spot ${spot.status}`;
+      el.id = `spot-${i}`;
+      el.innerHTML = spot.status === 'occupied' ? '<span class="car-icon">🚗</span>' : `<span>${String.fromCharCode(65+Math.floor(i/5))}${(i%5)+1}</span>`;
+      el.onclick = () => selectSpot(i);
+      el.title = `Spot ${String.fromCharCode(65+Math.floor(i/5))}${(i%5)+1}`;
+      grid.appendChild(el);
+    }
+    updateStats();
+  }
+
+  function selectSpot(id) {
+    const spot = spots[id];
+    if(spot.status === 'occupied') return;
+    if(spot.status === 'reserved' && spot.owner !== 'me') return;
+
+    // Deselect previous
+    if(selectedSpot !== null) {
+      const prev = spots[selectedSpot];
+      const prevEl = document.getElementById(`spot-${selectedSpot}`);
+      prevEl.classList.remove('selected');
+    }
+
+    if(selectedSpot === id) {
+      selectedSpot = null;
+      document.getElementById('selectedInfo').textContent = 'No spot selected';
+      document.getElementById('bookBtn').disabled = true;
+      return;
+    }
+
+    selectedSpot = id;
+    const el = document.getElementById(`spot-${id}`);
+    el.classList.add('selected');
+    const label = `${String.fromCharCode(65+Math.floor(id/5))}${(id%5)+1}`;
+    document.getElementById('selectedInfo').textContent = `Spot ${label} selected — Slot ${id+1} of 20`;
+    document.getElementById('bookBtn').disabled = spot.status !== 'available';
+  }
+
+  function confirmBooking() {
+    if(selectedSpot === null) return;
+    const spot = spots[selectedSpot];
+    if(spot.status !== 'available') return;
+
+    spot.status = 'reserved';
+    spot.owner = 'me';
+    const el = document.getElementById(`spot-${selectedSpot}`);
+    el.className = 'spot reserved selected';
+    el.innerHTML = `<span>✓</span>`;
+
+    document.getElementById('bookBtn').disabled = true;
+    document.getElementById('selectedInfo').textContent = `Spot reserved! Check in at the barrier.`;
+    selectedSpot = null;
+
+    updateStats();
+    showToast();
+  }
+
+  function updateStats() {
+    const avail = spots.filter(s => s.status === 'available').length;
+    const occ = spots.filter(s => s.status === 'occupied' || s.status === 'reserved').length;
+    document.getElementById('availCount').textContent = avail;
+    const pct = Math.round((occ/20)*100);
+    document.getElementById('occFill').style.width = pct + '%';
+    document.getElementById('occPct').textContent = pct + '%';
+  }
+
+  function showToast() {
+    const t = document.getElementById('toast');
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  // Simulate live sensor updates
+  setInterval(() => {
+    const avail = spots.filter(s => s.status === 'available');
+    if(avail.length > 2 && Math.random() < 0.25) {
+      const pick = avail[Math.floor(Math.random()*avail.length)];
+      pick.status = 'occupied';
+      const el = document.getElementById(`spot-${pick.id}`);
+      el.className = 'spot occupied';
+      el.innerHTML = '<span class="car-icon">🚗</span>';
+      updateStats();
+    }
+    // Random sensor flicker
+    const sensors = ['sen1','sen2'];
+    const msgs1 = ['All Clear','Detecting…','Standby'];
+    const msgs2 = ['3 Detected','2 Detected','4 Detected'];
+    document.getElementById('sen1').textContent = msgs1[Math.floor(Math.random()*3)];
+    document.getElementById('sen2').textContent = msgs2[Math.floor(Math.random()*3)];
+  }, 3000);
+
+  initParkingGrid();
+
+  // ===== SCROLL ANIMATIONS =====
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if(e.isIntersecting) { e.target.style.opacity='1'; e.target.style.transform='translateY(0)'; }
+    });
+  }, { threshold:0.1 });
+
+  document.querySelectorAll('.problem-card,.tech-card,.team-card,.benefit-item,.flow-step').forEach(el => {
+    el.style.opacity='0'; el.style.transform='translateY(20px)';
+    el.style.transition='opacity 0.5s ease, transform 0.5s ease';
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>
